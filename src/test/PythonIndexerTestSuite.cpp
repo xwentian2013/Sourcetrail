@@ -66,14 +66,21 @@ std::shared_ptr<TestStorage> parseCode(std::string code)
 
 		std::shared_ptr<IndexerCommandCustom> indexerCommand = std::make_shared<IndexerCommandCustom>(
 			INDEXER_COMMAND_PYTHON,
-			FilePath("../app").getConcatenated(ResourcePaths::getPythonPath()).makeAbsolute().wstr() +
-				L"SourcetrailPythonIndexer",
+			FilePath("../app")
+				.getConcatenated(ResourcePaths::getPythonPath())
+				.getConcatenated(L"SourcetrailPythonIndexer")
+				.makeAbsolute()
+				.makeCanonical()
+				.wstr(),
 			args,
 			rootPath,
 			tempDbPath,
 			std::to_wstring(SqliteIndexStorage::getStorageVersion()),
 			sourceFilePath,
 			true);
+
+		std::wcout << L"command1: " << indexerCommand->getCommand() << std::endl;
+		std::wcout << L"command2: " << utility::searchPath(indexerCommand->getCommand()) << std::endl;
 
 		const utility::ProcessOutput out = utility::executeProcess(
 			indexerCommand->getCommand(), indexerCommand->getArguments(), rootPath, false, -1, true);
